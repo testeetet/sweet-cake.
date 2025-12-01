@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SweetFinder 🍰 - Receitas de Sobremesa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fff7fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: #ff5fa2;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        #searchBox {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #ff5fa2;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .recipe-card {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 20px;
+        }
+
+        .recipe-card img {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .recipe-info h3 {
+            margin: 0;
+            color: #ff5fa2;
+        }
+
+        button {
+            background: #ff5fa2;
+            border: none;
+            padding: 10px 16px;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #e84e94;
+        }
+
+        .modal {
+            background: rgba(0,0,0,0.6);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>🍓 SweetFinder – Descubra Sobremesas!</header>
+
+<div class="container">
+    <input type="text" id="searchBox" placeholder="Pesquisar sobremesa...">
+
+    <div id="results"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+    <div class="modal-content" id="modalContent"></div>
+</div>
+
+<script>
+    const searchBox = document.getElementById('searchBox');
+    const results = document.getElementById('results');
+    const modal = document.getElementById('modal');
+    const modalContent = document.getElementById('modalContent');
+
+    async function fetchRecipes(query = "") {
+        const url = query === "" 
+            ? "https://www.themealdb.com/api/json/v1/1/filter.php?c=Dessert"
+            : `https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        displayRecipes(data.meals || []);
+    }
+
+    function displayRecipes(recipes) {
+        results.innerHTML = "";
+
+        recipes.forEach(meal => {
+            const card = document.createElement('div');
+            card.className = "recipe-card";
+
+            card.innerHTML = `
+                <img src="${meal.strMealThumb}">
+                <div class="recipe-info">
+                    <h3>${meal.strMeal}</h3>
+                    <button onclick="openRecipe(${meal.idMeal})">Ver Receita</button>
+                </div>
+            `;
+
+            results.appendChild(card);
+        });
+    }
+
+    async function openRecipe(id) {
+        const res = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
+        const data = await res.json();
+        const meal = data.meals[0];
+
+        let ingredients = "";
+        for (let i = 1; i <= 20; i++) {
+            if (meal[`strIngredient${i}`]) {
+                ingredients += `<li>${meal[`strIngredient${i}`]} - ${meal[`strMeasure${i}`]}</li>`;
+            }
+        }
+
+        modalContent.innerHTML = `
+            <h2>${meal.strMeal}</h2>
+            <img src="${meal.strMealThumb}" style="width:100%; border-radius:12px; margin:10px 0;">
+            <h3>Ingredientes</h3>
+            <ul>${ingredients}</ul>
+            <h3>Modo de preparo</h3>
+            <p>${meal.strInstructions}</p>
+            <button onclick="closeModal()">Fechar</button>
+        `;
+
+        modal.style.display = "flex";
+    }
+
+    function closeModal() {
+        modal.style.display = "none";
+    }
+
+    searchBox.addEventListener("input", () => {
+        fetchRecipes(searchBox.value);
+    });
+
+    window.onclick = function(event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    };
+
+    fetchRecipes();
+</script>
+
+</body>
+</html>
