@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SweetMind - Gerador de Sobremesas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🍰 SweetMind</h1>
+        <p>Digite os ingredientes e gere uma receita deliciosa com IA!</p>
+    </header>
+
+    <main>
+        <div class="box">
+            <h2>Quais ingredientes você tem?</h2>
+
+            <textarea id="ingredientes" placeholder="Exemplo: leite condensado, chocolate, morango..."></textarea>
+
+            <button onclick="gerarReceita()">Gerar Receita</button>
+        </div>
+
+        <div id="resultado" class="resultado hidden">
+            <h2>Resultado</h2>
+            <p id="loading" class="hidden">Gerando receita... 🍬</p>
+            <div id="receita"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>SweetMind © 2025 — Criado por Fê ✨</p>
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
